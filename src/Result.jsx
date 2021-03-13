@@ -47,10 +47,10 @@ function formatDelay(delay) {
   return `+${delay}ms`;
 }
 
-export default function Result({ result, loading, resultHeight }) {
+export default function Result({ result, loading, resultHeight, expect }) {
   const classes = useStyles();
 
-  const { Events, IsTest, TestsFailed } = result;
+  const { Events, IsTest, TestsFailed, Status } = result;
 
   if (!Events) {
     if (!resultHeight || Events === null) return null;
@@ -61,10 +61,23 @@ export default function Result({ result, loading, resultHeight }) {
       </Paper>
     );
   }
+  let gotExpected = true
+  let tmp = "";
+  if (!IsTest && expect != null) {
+    Events.forEach(({ Message }) => {
+      tmp += Message;
+    })
+    if (tmp != expect) {
+      gotExpected = false;
+    }
+  }
 
   return (
     <Paper className={classes.success} style={{ opacity: loading ? 0.5 : 1 }}>
-      <ResultIcon icon={IsTest && <Build />} success={!TestsFailed} color={TestsFailed ? 'red' : ' green'} />
+      {
+        !IsTest && (Status != 0 || !gotExpected) ? <ResultIcon success={false} color={'red'} /> :
+          <ResultIcon icon={Status == 0 && IsTest && <Build />} success={!TestsFailed} color={TestsFailed ? 'red' : ' green'} />
+      }
       <div className={classes.successText} style={{ height: resultHeight || 'auto', maxHeight: resultHeight || 'auto' }}>
         {Events.map(({ Message, Delay }, i) => {
           if (IsTest) {
@@ -81,6 +94,15 @@ export default function Result({ result, loading, resultHeight }) {
             </div>
           );
         })}
+        {!gotExpected ?
+          <div>
+            <h3>Expected Result</h3>
+
+            <div key={expect}>
+              {expect}
+            </div>
+          </div> : null
+        }
         <pre className={classes.buildResult}>Program exited.</pre>
       </div>
     </Paper>
