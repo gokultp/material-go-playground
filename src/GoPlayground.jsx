@@ -105,6 +105,8 @@ export default function GoPlayground(props) {
     onColorChange,
     onRun,
     onFormat,
+    markOptions,
+    expectedResults
   } = props;
 
   const [theme, setTheme] = useState(createTheme(color, themeExtend));
@@ -146,6 +148,11 @@ export default function GoPlayground(props) {
       theme: theme.palette.type === 'light' ? 'default' : 'darcula',
       readOnly,
     });
+    console.log(markOptions, "markOptions")
+    if (markOptions) {
+      cm.markText(markOptions.from, markOptions.to,{  css: "background-color: olive", readOnly: true });
+    }
+
 
     editor.current.cm = cm;
     editor.current.errors = [];
@@ -238,7 +245,7 @@ export default function GoPlayground(props) {
           <Fade in={running} timeout={200}>
             <div className={classes.resultOverlay}><CircularProgress color="secondary" /></div>
           </Fade>
-          <Result result={result} loading={running} resultHeight={resultHeight} />
+          <Result result={result} loading={running} resultHeight={resultHeight} expect={expectedResults}/>
           <Errors result={result} loading={running} resultHeight={resultHeight} />
         </div>
       </App>

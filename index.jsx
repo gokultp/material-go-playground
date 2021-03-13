@@ -163,6 +163,8 @@ function App() {
           <Grid item sm={12} xs={12}>
             <GoPlayground
               id="playground"
+              markOptions={{from: {line: 1, ch: 1}, to: {line: 10, ch:1}}}
+              expectedResults={"Hello, playground\n"}
               code={code2}
               title="Go playground"
               useTextOnButton={width > 500}
